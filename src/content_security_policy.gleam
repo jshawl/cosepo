@@ -46,11 +46,17 @@ pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
 }
 
 pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
-  list.fold(content_security_policy.directives, "", fn(acc, directive) {
-    acc
-    <> directive.name
-    <> list.fold(directive.value, "", fn(acc2, v) { acc2 <> " " <> v })
-    <> "; "
-  })
+  list.fold(
+    content_security_policy.directives,
+    "",
+    fn(serialized_csp, directive) {
+      serialized_csp
+      <> directive.name
+      <> list.fold(directive.value, "", fn(serialized_directive, value) {
+        serialized_directive <> " " <> value
+      })
+      <> "; "
+    },
+  )
   |> string.trim
 }

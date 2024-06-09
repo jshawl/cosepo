@@ -27,7 +27,7 @@ pub fn parse_error_test() {
 pub fn serialize_test() {
   ContentSecurityPolicy([
     Directive(name: "default-src", value: ["'self'", "https://example.com"]),
-    Directive(name: "img-src", value: ["'none'"])
+    Directive(name: "img-src", value: ["'none'"]),
   ])
   |> content_security_policy.serialize
   |> should.equal("default-src 'self' https://example.com; img-src 'none';")
