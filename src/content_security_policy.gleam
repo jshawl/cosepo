@@ -20,7 +20,7 @@ pub type Directive {
 ///         Directive(name: "default-src", value: ["'self'"]),
 ///       ])
 /// ```
-pub fn parse(serialized_csp: String) {
+pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
   let csp = Ok(ContentSecurityPolicy(directives: []))
   use accumulator, directive <- list.fold(
     string.split(serialized_csp, ";"),
@@ -43,4 +43,14 @@ pub fn parse(serialized_csp: String) {
       }
     }
   }
+}
+
+pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
+  list.fold(content_security_policy.directives, "", fn(acc, directive) {
+    acc
+    <> directive.name
+    <> list.fold(directive.value, "", fn(acc2, v) { acc2 <> " " <> v })
+    <> "; "
+  })
+  |> string.trim
 }

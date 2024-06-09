@@ -1,4 +1,4 @@
-import content_security_policy.{ContentSecurityPolicy}
+import content_security_policy.{ContentSecurityPolicy, Directive}
 import gleam/io
 import gleam/list
 import gleam/result
@@ -22,4 +22,13 @@ pub fn parse_test() {
 pub fn parse_error_test() {
   content_security_policy.parse("🙈")
   |> should.be_error
+}
+
+pub fn serialize_test() {
+  ContentSecurityPolicy([
+    Directive(name: "default-src", value: ["'self'", "https://example.com"]),
+    Directive(name: "img-src", value: ["'none'"])
+  ])
+  |> content_security_policy.serialize
+  |> should.equal("default-src 'self' https://example.com; img-src 'none';")
 }
