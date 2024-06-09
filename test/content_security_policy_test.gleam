@@ -1,3 +1,7 @@
+import content_security_policy.{ContentSecurityPolicy}
+import gleam/io
+import gleam/list
+import gleam/result
 import gleeunit
 import gleeunit/should
 
@@ -5,8 +9,17 @@ pub fn main() {
   gleeunit.main()
 }
 
-// gleeunit test functions end in `_test`
-pub fn hello_world_test() {
-  1
+pub fn parse_test() {
+  let csp =
+    content_security_policy.parse("default-src 'self' https://example.com")
+  csp
+  |> should.be_ok
+  let valid_csp = result.unwrap(csp, ContentSecurityPolicy(directive_set: []))
+  list.length(valid_csp.directive_set)
   |> should.equal(1)
+}
+
+pub fn parse_error_test() {
+  content_security_policy.parse("🙈")
+  |> should.be_error
 }
