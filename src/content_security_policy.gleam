@@ -21,7 +21,6 @@ pub type Directive {
 ///       ])
 /// ```
 pub fn parse(serialized_csp: String) {
-  
   let csp = Ok(ContentSecurityPolicy(directives: []))
   use accumulator, directive <- list.fold(
     string.split(serialized_csp, ";"),
