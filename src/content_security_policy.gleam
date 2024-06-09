@@ -3,7 +3,7 @@ import gleam/list
 import gleam/string
 
 pub type ContentSecurityPolicy {
-  ContentSecurityPolicy(directive_set: List(Directive))
+  ContentSecurityPolicy(directives: List(Directive))
 }
 
 pub type Directive {
@@ -12,7 +12,7 @@ pub type Directive {
 
 /// https://www.w3.org/TR/CSP3/#parse-serialized-policy
 pub fn parse(serialized_csp: String) {
-  let csp = Ok(ContentSecurityPolicy(directive_set: []))
+  let csp = Ok(ContentSecurityPolicy(directives: []))
   use accumulator, directive <- list.fold(
     string.split(serialized_csp, ";"),
     csp,
@@ -25,11 +25,11 @@ pub fn parse(serialized_csp: String) {
         [] | [_] -> Error("Invalid directive: " <> trimmed_directive)
         [name, ..value] -> {
           let name = string.lowercase(name)
-          let new_directive_set =
-            list.append(valid_csp.directive_set, [
+          let new_directives =
+            list.append(valid_csp.directives, [
               Directive(name: name, value: value),
             ])
-          Ok(ContentSecurityPolicy(directive_set: new_directive_set))
+          Ok(ContentSecurityPolicy(directives: new_directives))
         }
       }
     }

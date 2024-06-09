@@ -14,8 +14,8 @@ pub fn parse_test() {
     content_security_policy.parse("default-src 'self' https://example.com")
   csp
   |> should.be_ok
-  let valid_csp = result.unwrap(csp, ContentSecurityPolicy(directive_set: []))
-  list.length(valid_csp.directive_set)
+  let valid_csp = result.unwrap(csp, ContentSecurityPolicy(directives: []))
+  list.length(valid_csp.directives)
   |> should.equal(1)
 }
 
