@@ -1,3 +1,4 @@
+import gleam/int
 import gleam/io
 import gleam/list
 import gleam/string
@@ -6,8 +7,12 @@ pub type ContentSecurityPolicy {
   ContentSecurityPolicy(directives: List(Directive))
 }
 
-pub type Directive {
+pub opaque type Directive {
   Directive(name: String, value: List(String))
+}
+
+pub fn new_directive(name: String, value: List(String)) -> Result(Directive, a) {
+  Ok(Directive(name, value))
 }
 
 /// Parses a serialized content security policy string
