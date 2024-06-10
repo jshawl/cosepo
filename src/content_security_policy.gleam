@@ -63,18 +63,20 @@ pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
   |> string.trim
 }
 
+fn find_directive_by_name(
+  content_security_policy: ContentSecurityPolicy,
+  name: String,
+) {
+  use directive <- list.find(content_security_policy.directives)
+  directive.name == name
+}
+
 /// Merges a Directive with an existing ContentSecurityPolicy
 pub fn merge(
   content_security_policy: ContentSecurityPolicy,
   directive: Directive,
 ) -> ContentSecurityPolicy {
-  let existing_directive =
-    list.find(content_security_policy.directives, fn(el) {
-      let Directive(name, _value) = el
-      name == directive.name
-    })
-
-  case existing_directive {
+  case find_directive_by_name(content_security_policy, directive.name) {
     Error(_) -> {
       list.append(content_security_policy.directives, [directive])
     }
@@ -86,16 +88,9 @@ pub fn merge(
   |> ContentSecurityPolicy
 }
 
-pub fn set(
-  content_security_policy: ContentSecurityPolicy,
-  directive: Directive
-) {
-  let existing_directive =
-    list.find(content_security_policy.directives, fn(el) {
-      let Directive(name, _value) = el
-      name == directive.name
-    })
-  case existing_directive {
+/// Modifies a ContentSecurityPolicy, overwriting a previous directive, if present
+pub fn set(content_security_policy: ContentSecurityPolicy, directive: Directive) {
+  case find_directive_by_name(content_security_policy, directive.name) {
     Error(_) -> {
       list.append(content_security_policy.directives, [directive])
     }
