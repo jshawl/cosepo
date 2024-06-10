@@ -1,4 +1,5 @@
 import content_security_policy.{ContentSecurityPolicy}
+import gleam/io
 import gleam/list
 import gleam/result
 import gleeunit
@@ -16,11 +17,19 @@ pub fn parse_test() {
   let valid_csp = result.unwrap(csp, ContentSecurityPolicy(directives: []))
   list.length(valid_csp.directives)
   |> should.equal(1)
+
+  content_security_policy.parse("upgrade-insecure-requests;")
+  |> should.be_ok
 }
 
 pub fn parse_error_test() {
-  content_security_policy.parse("🙈")
-  |> should.be_error
+  content_security_policy.parse("invalid-directive 'self'")
+  |> result.unwrap_error("was not an error")
+  |> should.equal("invalid-directive is not a valid directive name")
+
+  content_security_policy.parse("default-src  ;")
+  |> result.unwrap_error("was not an error")
+  |> should.equal("missing directive values for default-src")
 }
 
 pub fn serialize_test() {

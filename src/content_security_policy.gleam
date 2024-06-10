@@ -1,3 +1,4 @@
+import gleam/io
 import gleam/list
 import gleam/string
 
@@ -16,12 +17,23 @@ pub opaque type Directive {
   Directive(name: String, value: List(String))
 }
 
+/// Creates a new `Directive`, validating the directive name
+/// and values.
+///
+/// ## Example
+/// ```gleam
+/// new_directive("default-src", ["'self'"])
+/// // -> Ok(Directive(name: "default-src", value: ["'self'"]))
+///
+/// new_directive("invalid-directive", [])
+/// // -> Error("invalid-directive is not a valid directive name.")
+/// ```
 pub fn new_directive(
-  name: String,
-  value: List(String),
+  name name: String,
+  value value: List(String),
 ) -> Result(Directive, String) {
   case list.find(valid_directive_names, fn(x) { x == name }) {
-    Error(_) -> Error(name <> " is not a valid directive name.")
+    Error(_) -> Error(name <> " is not a valid directive name")
     Ok(_) -> Ok(Directive(name, value))
   }
 }
@@ -33,8 +45,8 @@ pub fn new_directive(
 /// ```gleam
 /// parse("default-src 'self'")
 /// // -> ContentSecurityPolicy(directives: [
-///         Directive(name: "default-src", value: ["'self'"]),
-///       ])
+/// //      Directive(name: "default-src", value: ["'self'"]),
+/// //    ])
 /// ```
 pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
   let csp = Ok(ContentSecurityPolicy(directives: []))
@@ -47,14 +59,29 @@ pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
     Ok(valid_csp) -> {
       let trimmed_directive = string.trim(directive)
       case string.split(trimmed_directive, " ") {
-        [] | [_] -> Error("Invalid directive: " <> trimmed_directive)
+        [] -> Error("Nothing to parse!")
+        [name] -> {
+          case name {
+            "upgrade-insecure-requests" -> {
+              let new_directives =
+                list.append(valid_csp.directives, [
+                  Directive("upgrade-insecure-requests", []),
+                ])
+              Ok(ContentSecurityPolicy(directives: new_directives))
+            }
+            "" -> Ok(valid_csp)
+            _ -> Error("missing directive values for " <> trimmed_directive)
+          }
+        }
         [name, ..value] -> {
-          let name = string.lowercase(name)
-          let new_directives =
-            list.append(valid_csp.directives, [
-              Directive(name: name, value: value),
-            ])
-          Ok(ContentSecurityPolicy(directives: new_directives))
+          case new_directive(name: string.lowercase(name), value: value) {
+            Error(e) -> Error(e)
+            Ok(new_directive) -> {
+              let new_directives =
+                list.append(valid_csp.directives, [new_directive])
+              Ok(ContentSecurityPolicy(directives: new_directives))
+            }
+          }
         }
       }
     }
