@@ -15,6 +15,7 @@ gleam add cosepo
 
 ```gleam
 import cosepo
+import cosepo/directive
 
 pub fn main() {
   cosepo.parse("default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'")
@@ -23,12 +24,12 @@ pub fn main() {
   //   Directive("object-src", ["'none'"])])
   // )
 
-  let assert Ok(directive1) = cosepo.new_directive("default-src", ["'none'"])
-  let assert Ok(directive2) = cosepo.new_directive("script-src", ["https://example.com"])
+  let assert Ok(directive1) = directive.new_directive("default-src", ["'none'"])
+  let assert Ok(directive2) = directive.new_directive("script-src", ["https://example.com"])
   cosepo.serialize(ContentSecurityPolicy([directive1, directive2]))
   // -> "default-src 'none'; script-src https://example.com;"
 
-  cosepo.new_directive("an-invalid-directive", [])
+  directive.new_directive("an-invalid-directive", [])
   // -> Error("an-invalid-directive is not a valid directive name")
 }
 ```

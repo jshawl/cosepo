@@ -45,10 +45,24 @@ pub fn new_directive(
   }
 }
 
+/// Returns the name of a directive
+/// 
+/// ## Example
+/// ```gleam
+/// Directive("default-src", ["'none'"])
+/// |> get_name // -> "default-src"
+/// ```
 pub fn get_name(directive: Directive) {
   directive.name
 }
 
+/// Returns the value of a directive
+/// 
+/// ## Example
+/// ```gleam
+/// Directive("default-src", ["'none'"])
+/// |> get_value // -> ["'none'"]
+/// ```
 pub fn get_value(directive: Directive) {
   directive.value
 }
