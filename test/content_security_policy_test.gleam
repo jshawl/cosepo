@@ -30,6 +30,10 @@ pub fn parse_error_test() {
   content_security_policy.parse("default-src  ;")
   |> result.unwrap_error("was not an error")
   |> should.equal("missing directive values for default-src")
+
+  content_security_policy.parse("upgrade-insecure-requests 'self';")
+  |> result.unwrap_error("was not an error")
+  |> should.equal("unexpected values for upgrade-insecure-requests directive")
 }
 
 pub fn serialize_test() {

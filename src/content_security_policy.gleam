@@ -34,7 +34,18 @@ pub fn new_directive(
 ) -> Result(Directive, String) {
   case list.find(valid_directive_names, fn(x) { x == name }) {
     Error(_) -> Error(name <> " is not a valid directive name")
-    Ok(_) -> Ok(Directive(name, value))
+    Ok(_) -> {
+      case name {
+        "upgrade-insecure-requests" -> {
+          case value {
+            [] -> Ok(Directive(name, value))
+            _ -> Error("unexpected values for upgrade-insecure-requests directive")
+          }
+        }
+        _ -> Ok(Directive(name, value))
+      }
+      
+    }
   }
 }
 
@@ -63,11 +74,7 @@ pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
         [name] -> {
           case name {
             "upgrade-insecure-requests" -> {
-              let new_directives =
-                list.append(valid_csp.directives, [
-                  Directive("upgrade-insecure-requests", []),
-                ])
-              Ok(ContentSecurityPolicy(directives: new_directives))
+              Ok(merge(valid_csp, Directive("upgrade-insecure-requests", [])))
             }
             "" -> Ok(valid_csp)
             _ -> Error("missing directive values for " <> trimmed_directive)
@@ -77,9 +84,7 @@ pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
           case new_directive(name: string.lowercase(name), value: value) {
             Error(e) -> Error(e)
             Ok(new_directive) -> {
-              let new_directives =
-                list.append(valid_csp.directives, [new_directive])
-              Ok(ContentSecurityPolicy(directives: new_directives))
+              Ok(merge(valid_csp, new_directive))
             }
           }
         }
