@@ -28,7 +28,7 @@ pub fn main() {
   cosepo.serialize(ContentSecurityPolicy([directive1, directive2]))
   // -> "default-src 'none'; script-src https://example.com;"
 
-  cosepo.new_directive("an-invalid-directive")
+  cosepo.new_directive("an-invalid-directive", [])
   // -> Error("an-invalid-directive is not a valid directive name")
 }
 ```
