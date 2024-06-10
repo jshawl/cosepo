@@ -1,4 +1,3 @@
-import gleam/io
 import gleam/list
 import gleam/string
 
@@ -10,9 +9,11 @@ const valid_directive_names = [
   "base-uri", "child-src", "connect-src", "default-src", "font-src",
   "form-action", "frame-ancestors", "frame-src", "img-src", "manifest-src",
   "media-src", "object-src", "script-src", "script-src-attr", "script-src-elem",
-  "style-src", "style-src-attr", "style-src-elem", "upgrade-insecure-requests", "worker-src",
+  "style-src", "style-src-attr", "style-src-elem", "upgrade-insecure-requests",
+  "worker-src",
 ]
 
+/// Use `.new_directive(name: String, value: String)` to construct a `Directive` 
 pub opaque type Directive {
   Directive(name: String, value: List(String))
 }
@@ -26,7 +27,7 @@ pub opaque type Directive {
 /// // -> Ok(Directive(name: "default-src", value: ["'self'"]))
 ///
 /// new_directive("invalid-directive", [])
-/// // -> Error("invalid-directive is not a valid directive name.")
+/// // -> Error("invalid-directive is not a valid directive name")
 /// ```
 pub fn new_directive(
   name name: String,
@@ -55,9 +56,12 @@ pub fn new_directive(
 /// ## Example
 /// ```gleam
 /// parse("default-src 'self'")
-/// // -> ContentSecurityPolicy(directives: [
+/// // -> Ok(ContentSecurityPolicy(directives: [
 /// //      Directive(name: "default-src", value: ["'self'"]),
-/// //    ])
+/// //    ]))
+/// 
+/// parse("invalid-directive 'self'")
+/// // -> Error("invalid-directive is not a valid directive name")
 /// ```
 pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
   let csp = Ok(ContentSecurityPolicy(directives: []))
@@ -94,7 +98,14 @@ pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
 }
 
 /// Generates a serialized string, suitable for the Content-Security-Policy
-/// HTTP header
+/// HTTP header.
+/// 
+/// ## Example
+/// ```gleam
+/// let assert Ok(content_security_policy) = parse("default-src 'self';")
+/// content_security_policy |> serialize
+/// // -> "default-src 'self';"
+/// ```
 pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
   list.fold(
     content_security_policy.directives,
@@ -120,6 +131,16 @@ fn find_directive_by_name(
 }
 
 /// Merges a Directive with an existing ContentSecurityPolicy
+/// 
+/// ## Example
+/// ```gleam
+/// let existing_csp = parse("default-src 'self';")
+/// let assert Ok(directive) = new_directive("default-src", ["https://example.com/"])
+/// merge(existing_csp, directive)
+/// // -> ContentSecurityPolicy([
+/// //   Directive("default-src", ["'self'", "https://example.com"])
+/// // ])
+/// ```
 pub fn merge(
   content_security_policy: ContentSecurityPolicy,
   directive: Directive,
@@ -137,6 +158,14 @@ pub fn merge(
 }
 
 /// Modifies a ContentSecurityPolicy, overwriting a previous directive, if present
+/// 
+/// ## Example
+/// ```gleam
+/// let assert Ok(content_security_policy) = parse("default-src 'self'")
+/// let assert Ok(directive) = new_directive("default-src", ["'none'"])
+/// set(content_security_policy, directive) |> serialize
+/// // -> "default-src 'none';"
+/// ```
 pub fn set(content_security_policy: ContentSecurityPolicy, directive: Directive) {
   case find_directive_by_name(content_security_policy, directive.name) {
     Error(_) -> {

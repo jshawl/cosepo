@@ -10,8 +10,7 @@ pub fn main() {
 }
 
 pub fn parse_test() {
-  let csp =
-    cosepo.parse("default-src 'self' https://example.com")
+  let csp = cosepo.parse("default-src 'self' https://example.com")
   csp
   |> should.be_ok
   let valid_csp = result.unwrap(csp, ContentSecurityPolicy(directives: []))
@@ -38,19 +37,15 @@ pub fn parse_error_test() {
 
 pub fn serialize_test() {
   let assert Ok(directive1) =
-    cosepo.new_directive("default-src", [
-      "'self'", "https://example.com",
-    ])
-  let assert Ok(directive2) =
-    cosepo.new_directive("img-src", ["'none'"])
+    cosepo.new_directive("default-src", ["'self'", "https://example.com"])
+  let assert Ok(directive2) = cosepo.new_directive("img-src", ["'none'"])
   ContentSecurityPolicy([directive1, directive2])
   |> cosepo.serialize
   |> should.equal("default-src 'self' https://example.com; img-src 'none';")
 }
 
 pub fn serialize_upgrade_insecure_requests_test() {
-  let assert Ok(directive1) =
-    cosepo.new_directive("default-src", ["'none'"])
+  let assert Ok(directive1) = cosepo.new_directive("default-src", ["'none'"])
   let assert Ok(directive2) =
     cosepo.new_directive("upgrade-insecure-requests", [])
 
@@ -60,8 +55,7 @@ pub fn serialize_upgrade_insecure_requests_test() {
 }
 
 pub fn merge_to_empty_test() {
-  let assert Ok(directive1) =
-    cosepo.new_directive("default-src", ["'none'"])
+  let assert Ok(directive1) = cosepo.new_directive("default-src", ["'none'"])
 
   ContentSecurityPolicy([])
   |> cosepo.merge(directive1)
@@ -69,10 +63,8 @@ pub fn merge_to_empty_test() {
 }
 
 pub fn merge_to_new_directive_test() {
-  let assert Ok(directive1) =
-    cosepo.new_directive("default-src", ["'none'"])
-  let assert Ok(directive2) =
-    cosepo.new_directive("img-src", ["'none'"])
+  let assert Ok(directive1) = cosepo.new_directive("default-src", ["'none'"])
+  let assert Ok(directive2) = cosepo.new_directive("img-src", ["'none'"])
   ContentSecurityPolicy([directive1])
   |> cosepo.merge(directive2)
   |> should.equal(ContentSecurityPolicy([directive1, directive2]))
@@ -80,9 +72,7 @@ pub fn merge_to_new_directive_test() {
 
 pub fn merge_to_existing_directive_test() {
   let assert Ok(directive1) =
-    cosepo.new_directive("default-src", [
-      "'self'", "http://example.com",
-    ])
+    cosepo.new_directive("default-src", ["'self'", "http://example.com"])
   let assert Ok(directive2) =
     cosepo.new_directive("default-src", ["https://example.com"])
   let assert Ok(merged_directive) =
@@ -95,10 +85,8 @@ pub fn merge_to_existing_directive_test() {
 }
 
 pub fn set_test() {
-  let assert Ok(directive1) =
-    cosepo.new_directive("default-src", ["'self'"])
-  let assert Ok(directive2) =
-    cosepo.new_directive("default-src", ["'none'"])
+  let assert Ok(directive1) = cosepo.new_directive("default-src", ["'self'"])
+  let assert Ok(directive2) = cosepo.new_directive("default-src", ["'none'"])
   ContentSecurityPolicy([directive1])
   |> cosepo.set(directive2)
   |> should.equal(ContentSecurityPolicy([directive2]))
