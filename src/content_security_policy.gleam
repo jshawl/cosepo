@@ -7,12 +7,25 @@ pub type ContentSecurityPolicy {
   ContentSecurityPolicy(directives: List(Directive))
 }
 
+const valid_directive_names = [
+  "base-uri", "child-src", "connect-src", "default-src", "font-src",
+  "form-action", "frame-ancestors", "frame-src", "img-src", "manifest-src",
+  "media-src", "object-src", "script-src", "style-src",
+  "upgrade-insecure-requests", "worker-src",
+]
+
 pub opaque type Directive {
   Directive(name: String, value: List(String))
 }
 
-pub fn new_directive(name: String, value: List(String)) -> Result(Directive, a) {
-  Ok(Directive(name, value))
+pub fn new_directive(
+  name: String,
+  value: List(String),
+) -> Result(Directive, String) {
+  case list.find(valid_directive_names, fn(x) { x == name }) {
+    Error(_) -> Error(name <> " is not a valid directive name.")
+    Ok(_) -> Ok(Directive(name, value))
+  }
 }
 
 /// Parses a serialized content security policy string

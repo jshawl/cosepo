@@ -36,6 +36,17 @@ pub fn serialize_test() {
   |> should.equal("default-src 'self' https://example.com; img-src 'none';")
 }
 
+pub fn serialize_upgrade_insecure_requests_test() {
+  let assert Ok(directive1) =
+    content_security_policy.new_directive("default-src", ["'none'"])
+  let assert Ok(directive2) =
+    content_security_policy.new_directive("upgrade-insecure-requests", [])
+
+  ContentSecurityPolicy([directive1, directive2])
+  |> content_security_policy.serialize
+  |> should.equal("default-src 'none'; upgrade-insecure-requests;")
+}
+
 pub fn merge_to_empty_test() {
   let assert Ok(directive1) =
     content_security_policy.new_directive("default-src", ["'none'"])
@@ -79,4 +90,9 @@ pub fn set_test() {
   ContentSecurityPolicy([directive1])
   |> content_security_policy.set(directive2)
   |> should.equal(ContentSecurityPolicy([directive2]))
+}
+
+pub fn new_directive_test() {
+  content_security_policy.new_directive("invalid-src", ["'self'"])
+  |> should.be_error
 }
