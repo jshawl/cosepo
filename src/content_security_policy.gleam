@@ -67,7 +67,7 @@ pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
 pub fn merge(
   content_security_policy: ContentSecurityPolicy,
   directive: Directive,
-) {
+) -> ContentSecurityPolicy {
   let existing_directive =
     list.find(content_security_policy.directives, fn(el) {
       let Directive(name, _value) = el
@@ -81,6 +81,26 @@ pub fn merge(
     Ok(existing_directive) -> {
       let value = list.append(existing_directive.value, directive.value)
       [Directive(..directive, value: value)]
+    }
+  }
+  |> ContentSecurityPolicy
+}
+
+pub fn set(
+  content_security_policy: ContentSecurityPolicy,
+  directive: Directive
+) {
+  let existing_directive =
+    list.find(content_security_policy.directives, fn(el) {
+      let Directive(name, _value) = el
+      name == directive.name
+    })
+  case existing_directive {
+    Error(_) -> {
+      list.append(content_security_policy.directives, [directive])
+    }
+    Ok(existing_directive) -> {
+      [Directive(..existing_directive, value: directive.value)]
     }
   }
   |> ContentSecurityPolicy

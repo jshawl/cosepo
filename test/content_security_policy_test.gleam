@@ -65,3 +65,17 @@ pub fn merge_to_existing_directive_test() {
     ]),
   )
 }
+
+pub fn set_test() {
+   ContentSecurityPolicy([
+    Directive("default-src", ["'self'"]),
+  ])
+  |> content_security_policy.set(
+    Directive("default-src", ["'none'"]),
+  )
+  |> should.equal(
+    ContentSecurityPolicy([
+      Directive("default-src", ["'none'"]),
+    ]),
+  )
+}
