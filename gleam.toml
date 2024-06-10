@@ -1,5 +1,5 @@
 name = "cosepo"
-version = "0.0.1"
+version = "0.0.2"
 description = "A module for parsing, mutating, and serializing Content-Security-Policy directives."
 repository = { type = "github", user = "jshawl", repo = "cosepo" }
 licences = ["Apache-2.0"]
