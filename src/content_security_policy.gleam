@@ -45,6 +45,8 @@ pub fn parse(serialized_csp: String) -> Result(ContentSecurityPolicy, String) {
   }
 }
 
+/// Generates a serialized string, suitable for the Content-Security-Policy
+/// HTTP header
 pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
   list.fold(
     content_security_policy.directives,
@@ -59,4 +61,27 @@ pub fn serialize(content_security_policy: ContentSecurityPolicy) -> String {
     },
   )
   |> string.trim
+}
+
+/// Merges a Directive with an existing ContentSecurityPolicy
+pub fn merge(
+  content_security_policy: ContentSecurityPolicy,
+  directive: Directive,
+) {
+  let existing_directive =
+    list.find(content_security_policy.directives, fn(el) {
+      let Directive(name, _value) = el
+      name == directive.name
+    })
+
+  case existing_directive {
+    Error(_) -> {
+      list.append(content_security_policy.directives, [directive])
+    }
+    Ok(existing_directive) -> {
+      let value = list.append(existing_directive.value, directive.value)
+      [Directive(..directive, value: value)]
+    }
+  }
+  |> ContentSecurityPolicy
 }

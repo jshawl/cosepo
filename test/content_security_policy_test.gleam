@@ -26,9 +26,38 @@ pub fn parse_error_test() {
 
 pub fn serialize_test() {
   ContentSecurityPolicy([
-    Directive(name: "default-src", value: ["'self'", "https://example.com"]),
-    Directive(name: "img-src", value: ["'none'"]),
+    Directive("default-src", ["'self'", "https://example.com"]),
+    Directive("img-src", ["'none'"]),
   ])
   |> content_security_policy.serialize
   |> should.equal("default-src 'self' https://example.com; img-src 'none';")
+}
+
+pub fn merge_to_empty_test() {
+  ContentSecurityPolicy([])
+  |> content_security_policy.merge(Directive("default-src", ["'none'"]))
+  |> should.equal(ContentSecurityPolicy([Directive("default-src", ["'none'"])]))
+}
+
+pub fn merge_to_new_directive_test() {
+  ContentSecurityPolicy([Directive("default-src", ["'none'"])])
+  |> content_security_policy.merge(Directive("img-src", ["'none'"]))
+  |> should.equal(
+    ContentSecurityPolicy([
+      Directive("default-src", ["'none'"]),
+      Directive("img-src", ["'none'"]),
+    ]),
+  )
+}
+
+pub fn merge_to_existing_directive_test() {
+  ContentSecurityPolicy([Directive("default-src", ["'self'", "http://example.com"])])
+  |> content_security_policy.merge(
+    Directive("default-src", ["https://example.com"]),
+  )
+  |> should.equal(
+    ContentSecurityPolicy([
+      Directive("default-src", ["'self'", "http://example.com", "https://example.com"]),
+    ]),
+  )
 }
