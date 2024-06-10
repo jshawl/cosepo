@@ -1,5 +1,4 @@
 import content_security_policy.{ContentSecurityPolicy}
-import gleam/io
 import gleam/list
 import gleam/result
 import gleeunit
