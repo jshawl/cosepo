@@ -51,13 +51,17 @@ pub fn merge_to_new_directive_test() {
 }
 
 pub fn merge_to_existing_directive_test() {
-  ContentSecurityPolicy([Directive("default-src", ["'self'", "http://example.com"])])
+  ContentSecurityPolicy([
+    Directive("default-src", ["'self'", "http://example.com"]),
+  ])
   |> content_security_policy.merge(
     Directive("default-src", ["https://example.com"]),
   )
   |> should.equal(
     ContentSecurityPolicy([
-      Directive("default-src", ["'self'", "http://example.com", "https://example.com"]),
+      Directive("default-src", [
+        "'self'", "http://example.com", "https://example.com",
+      ]),
     ]),
   )
 }
