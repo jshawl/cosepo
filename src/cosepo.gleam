@@ -9,8 +9,8 @@ pub type ContentSecurityPolicy {
 const valid_directive_names = [
   "base-uri", "child-src", "connect-src", "default-src", "font-src",
   "form-action", "frame-ancestors", "frame-src", "img-src", "manifest-src",
-  "media-src", "object-src", "script-src", "style-src",
-  "upgrade-insecure-requests", "worker-src",
+  "media-src", "object-src", "script-src", "script-src-attr", "script-src-elem",
+  "style-src", "style-src-attr", "style-src-elem", "upgrade-insecure-requests", "worker-src",
 ]
 
 pub opaque type Directive {
@@ -39,12 +39,12 @@ pub fn new_directive(
         "upgrade-insecure-requests" -> {
           case value {
             [] -> Ok(Directive(name, value))
-            _ -> Error("unexpected values for upgrade-insecure-requests directive")
+            _ ->
+              Error("unexpected values for upgrade-insecure-requests directive")
           }
         }
         _ -> Ok(Directive(name, value))
       }
-      
     }
   }
 }
