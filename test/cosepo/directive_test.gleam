@@ -14,6 +14,11 @@ pub fn new_directive_test() {
   |> should.be_ok
 }
 
+pub fn new_directive_deprecated_test() {
+  directive.new_directive("report-uri", ["https://example.com"])
+  |> should.be_ok
+}
+
 pub fn get_name_test() {
   let assert Ok(d) = directive.new_directive("default-src", ["'self'"])
   d |> directive.get_name |> should.equal("default-src")

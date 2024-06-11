@@ -1,5 +1,7 @@
 import gleam/list
 
+const deprecated_directive_names = ["report-uri"]
+
 const valid_directive_names = [
   "base-uri", "child-src", "connect-src", "default-src", "font-src",
   "form-action", "frame-ancestors", "frame-src", "img-src", "manifest-src",
@@ -28,7 +30,9 @@ pub fn new_directive(
   name name: String,
   value value: List(String),
 ) -> Result(Directive, String) {
-  case list.find(valid_directive_names, fn(x) { x == name }) {
+  let directive_names =
+    list.append(valid_directive_names, deprecated_directive_names)
+  case list.find(directive_names, fn(x) { x == name }) {
     Error(_) -> Error(name <> " is not a valid directive name")
     Ok(_) -> {
       case name {
